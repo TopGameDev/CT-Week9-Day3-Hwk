@@ -5,22 +5,22 @@ import Form from 'react-bootstrap/Form'
 import Button from 'react-bootstrap/Button'
 import UserType from '../types/user'
 import CategoryType from '../types/category'
-import { register } from '../lib/apiWrapper'
+import { register, login } from '../lib/apiWrapper'
 
 type RegisterProps = {
+  logUserIn: (user:UserType) => void
   flashMessage: (message: string|null, category: CategoryType|null) => void,
 }
 
-export default function Register({ flashMessage }: RegisterProps) {
+export default function Register({ flashMessage, logUserIn }: RegisterProps) {
   const navigate = useNavigate()
   const [userFormData, setUserFormData] = useState<Partial<UserType>>(
     {
       email: '',
-      firstName: '',
-      lastName: '',
+      first_name: '',
+      last_name: '',
       password: '',
       confirmPassword: '',
-
     }
   )
 
@@ -34,8 +34,13 @@ const handleFormSubmit = async (e: React.FormEvent): Promise<void> => {
   if (response.error) {
       flashMessage(response.error, 'danger')
   } else {
-      flashMessage(`Enjoy your questions ${userFormData.firstName}`, 'success')
+      flashMessage(`Enjoy your questions ${userFormData.first_name}`, 'success')
       console.log(userFormData)
+      const newUser = response.data
+      let loginResponse = await login(userFormData.email!, userFormData.password!)
+      localStorage.setItem('token', loginResponse.data?.token!)
+      localStorage.setItem('tokenExp', loginResponse.data?.tokenExpiration!)
+      logUserIn(newUser!);
       navigate('/')
   }
 }
@@ -53,10 +58,10 @@ const validPasswords:boolean = validatePasswords(userFormData.password!, userFor
             <Card.Body>
                 <Form onSubmit={handleFormSubmit}>
                     <Form.Label>First Name</Form.Label>
-                    <Form.Control name='firstName' value={userFormData.firstName} onChange={handleInputChange}/>
+                    <Form.Control name='first_name' value={userFormData.first_name} onChange={handleInputChange}/>
 
                     <Form.Label>Last Name</Form.Label>
-                    <Form.Control name='lastName' value={userFormData.lastName} onChange={handleInputChange}/>
+                    <Form.Control name='last_name' value={userFormData.last_name} onChange={handleInputChange}/>
 
                     <Form.Label>Email</Form.Label>
                     <Form.Control name='email' type='email' value={userFormData.email} onChange={handleInputChange}/>

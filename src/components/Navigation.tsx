@@ -3,16 +3,30 @@ import Nav from 'react-bootstrap/Nav'
 import Container from 'react-bootstrap/Container'
 import { Link } from 'react-router-dom'
 
-type Props = {}
+type Props = {
+  isLoggedIn: boolean,
+  handleClick: ()=>void
+}
 
-export default function Navigation({}: Props) {
+export default function Navigation({isLoggedIn, handleClick}: Props) {
   return (
     <Navbar bg='success' data-bs-theme='dark'>
             <Container>
-                <Navbar.Brand href='/'>Quiz Up</Navbar.Brand>
+                <Navbar.Brand as={Link} to='/'>Quiz Up</Navbar.Brand>
                 <Nav className='me-auto'>
-                    <Nav.Link as={Link} to='/'>Home</Nav.Link>
-                    <Nav.Link as={Link} to='/register'>Sign Up</Nav.Link>
+                  {isLoggedIn ? (
+                      <>
+                        <Nav.Link as={Link} to='/allquestions'>All Questions</Nav.Link>
+                        <Nav.Link as={Link} to='/myquestions'>My Questions</Nav.Link>
+                        <Nav.Link as={Link} to='/edituser'>Edit User</Nav.Link>
+                        <Nav.Link as='button' onClick={handleClick}>Log Out</Nav.Link>
+                      </>
+                  ): (
+                      <>
+                        <Nav.Link as={Link} to='/register'>Sign Up</Nav.Link>
+                        <Nav.Link as={Link} to='/login'>Log In</Nav.Link>
+                      </>
+                  )}
                 </Nav>
             </Container>
         </Navbar>
